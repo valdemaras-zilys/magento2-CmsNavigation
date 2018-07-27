@@ -24,7 +24,8 @@ class InstallSchema implements InstallSchemaInterface
             [
                 'type' => \Magento\Framework\DB\Ddl\Table::TYPE_BOOLEAN,
                 'nullable' => false,
-                'comment' => 'Flag whether or not CMS page should be included in top navigation'
+                'comment' => 'Flag whether or not CMS page should be included in top navigation',
+                'default' => 0
             ]
         );
         $installer->endSetup();
