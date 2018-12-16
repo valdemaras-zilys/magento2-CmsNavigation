@@ -4,7 +4,6 @@ namespace Raguvis\CmsNavigation\Plugin\Block;
 
 use Magento\Framework\Data\Tree\NodeFactory;
 use Magento\Cms\Model\ResourceModel\Page\CollectionFactory as PageCollectionFactory;
-use Magento\Framework\ObjectManagerInterface as Objectmanager;
 
 class Navigation
 {
@@ -14,17 +13,17 @@ class Navigation
     protected $nodeFactory;
 
     /**
-     * @var CollectionFactory $pageCollectionFactory
+     * @var \Magento\Cms\Model\ResourceModel\Page\CollectionFactory $pageCollectionFactory
      */
     protected $pageCollectionFactory;
 
     /**
-     * @var ObjectManagerInterface $objectmanager
+     * @var \Magento\Store\Model\StoreManagerInterface $objectmanager
      */
-    protected $objectmanager;
+    protected $storeManager;
 
     /**
-     * @var Magento\Cms\Helper\Page $cmsPageHelper
+     * @var \Magento\Cms\Helper\Page $cmsPageHelper
      */
     protected $cmsPageHelper;
 
@@ -36,14 +35,16 @@ class Navigation
     public function __construct(
         NodeFactory $nodeFactory,
         PageCollectionFactory $pageCollectionFactory,
-        Objectmanager $objectmanager
+        \Magento\Cms\Helper\Page $pageHelper,
+        \Magento\Store\Model\StoreManagerInterface $storeManager,
+        \Magento\Cms\Model\Page $page
     )
     {
         $this->nodeFactory = $nodeFactory;
         $this->pageCollectionFactory = $pageCollectionFactory;
-        $this->objectmanager = $objectmanager;
-        $this->cmsPageHelper = $this->objectmanager->create('Magento\Cms\Helper\Page');
-        $this->currentPageIdentifier = $this->objectmanager->get('\Magento\Cms\Model\Page')->getIdentifier();
+        $this->cmsPageHelper = $pageHelper;
+        $this->currentPageIdentifier = $page->getIdentifier();
+        $this->storeManager = $storeManager;
     }
 
     /**
@@ -72,20 +73,21 @@ class Navigation
     /**
      * Prepare and return array of pages to be included in top navigation
      *
-     * @return Magento\Cms\Model\ResourceModel\Page\Collection
+     * @return \Magento\Cms\Model\ResourceModel\Page\Collection
      */
     protected function getPageCollection()
     {
         $collection = $this->pageCollectionFactory->create();
         $collection->addFieldToFilter('show_in_navigation', ['eq' => 1]);
         $collection->addFieldToFilter('is_active', ['eq' => 1]);
+        $collection->addStoreFilter($this->storeManager->getStore()->getId());
         return $collection;
     }
 
     /**
      * Prepare node array from Page object
      *
-     * @param Magento\Cms\Model\Page $page
+     * @param \Magento\Cms\Model\Page $page
      * @return array
      */
     protected function getNodeAsArray($page)
