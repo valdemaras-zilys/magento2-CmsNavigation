@@ -2,7 +2,7 @@
   "name": "raguvis/magento2-cms-navigation",
   "description": "CMS Navigation module",
   "type": "magento2-module",
-  "version": "0.0.4",
+  "version": "0.0.6",
   "license": [
     "MIT"
   ],
